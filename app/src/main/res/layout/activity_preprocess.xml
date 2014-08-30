@@ -41,6 +41,7 @@
         android:layout_height="wrap_content"
         android:text="Use Picture"
         android:id="@+id/button"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:onClick="grade"/>
 
 </LinearLayout>

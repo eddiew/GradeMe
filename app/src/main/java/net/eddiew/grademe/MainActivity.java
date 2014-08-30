@@ -34,7 +34,7 @@ public class MainActivity extends Activity implements NewTestDFragment.NewTestDL
     ArrayList<String> menuItems = new ArrayList<String>();
 
     private AssetManager assMan;
-    public static TessBaseAPI Tess;
+//    public static TessBaseAPI Tess;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,17 +59,17 @@ public class MainActivity extends Activity implements NewTestDFragment.NewTestDL
         };
         listView.setOnItemClickListener(mMessageClickedHandler);
 
-        // Tesseract Initialization
-        try {
-            tessSetup();
-        }
-        catch (IOException e) {
-            Log.e("Tesseract Setup", "FAILED: IO Exception");
-            e.printStackTrace();
-            return;
-        }
-        Tess = new TessBaseAPI();
-        Tess.init(DATA_PATH, "eng");
+//        // Tesseract Initialization
+//        try {
+//            tessSetup();
+//        }
+//        catch (IOException e) {
+//            Log.e("Tesseract Setup", "FAILED: IO Exception");
+//            e.printStackTrace();
+//            return;
+//        }
+//        Tess = new TessBaseAPI();
+//        Tess.init(DATA_PATH, "eng");
 
 //        // OCR test TODO: remove
 //        Bitmap testBitmap;

@@ -7,8 +7,9 @@
     <string name="title_activity_camera_preview">CameraPreviewActivity</string>
     <string name="title_activity_preprocess">Preprocess Image</string>
     <string-array name="preprocess_configurables">
-        <item>Sharpness</item>
+        <!--<item>Sharpness</item>-->
         <item>Brightness</item>
         <item>Contrast</item>
     </string-array>
+    <string name="title_activity_grade">Grading Results</string>
 </resources>
