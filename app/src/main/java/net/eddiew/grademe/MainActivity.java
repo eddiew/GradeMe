@@ -3,6 +3,10 @@ package net.eddiew.grademe;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -13,8 +17,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.googlecode.leptonica.android.Pix;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,11 +33,13 @@ public class MainActivity extends Activity {
     ArrayAdapter<String> adapter;
     public static final String DATA_PATH = Environment.getExternalStorageDirectory().toString() + "/GradeMe/";
     String[] menuItems = {"Camera Control Demo", "Blank1", "Blank2"};
+    private AssetManager assMan;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        assMan = getAssets();
 
         // Sets items in ListView
         adapter = new ArrayAdapter<String>(this,
@@ -45,6 +54,8 @@ public class MainActivity extends Activity {
             }
         };
         listView.setOnItemClickListener(mMessageClickedHandler);
+
+        // Tesseract Initialization
         try {
             tessSetup();
         }
@@ -55,11 +66,31 @@ public class MainActivity extends Activity {
         }
         TessBaseAPI tess = new TessBaseAPI();
         tess.init(DATA_PATH, "eng");
+
+        // OCR test TODO: remove
+        Bitmap testBitmap;
+        try {
+            InputStream bis = assMan.open("test-images/test2.png");
+            //Drawable d = Drawable.createFromStream(bis, null);
+            //Canvas canvas = new Canvas(testBitmap);
+            testBitmap = BitmapFactory.decodeStream(bis);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            Log.e("OCR Test", "IOException");
+            return;
+        }
+        tess.setImage(testBitmap);
+        String text = tess.getUTF8Text();
+        String[] lines = text.split("\n");
+        for (String line : lines) {
+            Log.i("OCR Output", line);
+        }
+        tess.end();
     }
 
     private void tessSetup() throws IOException{
         new File(DATA_PATH + "tessdata/").mkdirs();
-        AssetManager assMan = getAssets();
         for (String fileName : assMan.list("tessdata")) {
             InputStream in = assMan.open("tessdata/" + fileName);
             File file = new File(DATA_PATH + "tessdata/" + fileName);
