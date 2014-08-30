@@ -1,35 +1,59 @@
 package net.eddiew.grademe;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
 
 public class MainActivity extends Activity {
+    ArrayAdapter<String> adapter;
+
+    String[] menuItems = {"Camera Control Demo", "Blank1", "Blank2"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        AssetManager assetManager = getAssets();
-        String[] assetNames;
-        try {
-            assetNames = assetManager.list("");
+
+        // Sets items in ListView
+        adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, menuItems);
+        ListView listView = (ListView) findViewById(R.id.testListView);
+        listView.setAdapter(adapter);
+
+        // Click listener
+        AdapterView.OnItemClickListener mMessageClickedHandler = new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView parent, View v, int position, long id) {
+                switchActivity(position);
+            }
+        };
+        listView.setOnItemClickListener(mMessageClickedHandler);
+    }
+
+    private void switchActivity(int id)
+    {
+        switch (id) {
+            case 0:
+                Intent intent = new Intent(this, CameraPreviewActivity.class);
+                startActivity(intent);
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+            default:
+                break;
         }
-        catch (Exception e) {
-            assetNames = new String[]{"NONE FOUND"};
-        }
-        for (String asset : assetNames) {
-            Log.e("assets", asset);
-        }
-//        TessBaseAPI tess = new TessBaseAPI();
-//        tess.init("assets/tessdata/eng.traineddata", "eng");
-//        tess.setImage("assets/test2.png");
     }
 
     @Override
