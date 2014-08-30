@@ -34,6 +34,7 @@ public class MainActivity extends Activity implements NewTestDFragment.NewTestDL
     ArrayList<String> menuItems = new ArrayList<String>();
 
     private AssetManager assMan;
+    public static TessBaseAPI Tess;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +52,8 @@ public class MainActivity extends Activity implements NewTestDFragment.NewTestDL
         // Click listener
         AdapterView.OnItemClickListener mMessageClickedHandler = new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView parent, View v, int position, long id) {
-                switchActivity(position);
+                Intent intent = new Intent(getApplicationContext(), CameraPreviewActivity.class);
+                startActivity(intent);
             }
         };
         listView.setOnItemClickListener(mMessageClickedHandler);
@@ -65,29 +67,26 @@ public class MainActivity extends Activity implements NewTestDFragment.NewTestDL
             e.printStackTrace();
             return;
         }
-        TessBaseAPI tess = new TessBaseAPI();
-        tess.init(DATA_PATH, "eng");
+        Tess = new TessBaseAPI();
+        Tess.init(DATA_PATH, "eng");
 
-        // OCR test TODO: remove
-        Bitmap testBitmap;
-        try {
-            InputStream bis = assMan.open("test-images/test2.png");
-            //Drawable d = Drawable.createFromStream(bis, null);
-            //Canvas canvas = new Canvas(testBitmap);
-            testBitmap = BitmapFactory.decodeStream(bis);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            Log.e("OCR Test", "IOException");
-            return;
-        }
-        tess.setImage(testBitmap);
-        String text = tess.getUTF8Text();
-        String[] lines = text.split("\n");
-        for (String line : lines) {
-            Log.i("OCR Output", line);
-        }
-        tess.end();
+//        // OCR test TODO: remove
+//        Bitmap testBitmap;
+//        try {
+//            InputStream bis = assMan.open("test-images/TEST_1.JPG");
+//            //Drawable d = Drawable.createFromStream(bis, null);
+//            //Canvas canvas = new Canvas(testBitmap);
+//            testBitmap = BitmapFactory.decodeStream(bis);
+//        }
+//        catch (IOException e) {
+//            e.printStackTrace();
+//            Log.e("OCR Test", "IOException");
+//            return;
+//        }
+//        Tess.setImage(testBitmap);
+//        String hocrText = Tess.getHOCRText(0);
+//        String boxText = Tess.getBoxText(0);
+//        Tess.end();
     }
 
     private void tessSetup() throws IOException{
@@ -107,27 +106,6 @@ public class MainActivity extends Activity implements NewTestDFragment.NewTestDL
             Log.v("Tesseract Setup", "Copied: " + fileName);
         }
         Log.v("Tesseract Setup", "All tessdata files copied.");
-    }
-
-    private void switchActivity(int id)
-    {
-        switch (id) {
-            case 0:
-                Intent intent = new Intent(this, CameraPreviewActivity.class);
-                startActivity(intent);
-                break;
-            case 1:
-                break;
-            case 2:
-                break;
-            default:
-                break;
-        }
-    }
-
-    private void createNewTest()
-    {
-        new NewTestDFragment().show(getFragmentManager(), "");
     }
 
     @Override

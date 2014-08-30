@@ -13,29 +13,32 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private SurfaceHolder mHolder;
     private Camera mCamera;
 
-    public CameraPreview(Context context, Camera camera) {
+    public CameraPreview(Context context) {
         super(context);
-        mCamera = camera;
-
         // Install a SurfaceHolder.Callback so we get notified when the
         // underlying surface is created and destroyed.
         mHolder = getHolder();
         mHolder.addCallback(this);
     }
 
+    public void setCamera(Camera camera) {
+        mCamera = camera;
+    }
+
     public void surfaceCreated(SurfaceHolder holder) {
-        // The Surface has been created, now tell the camera where to draw the preview.
+        // Tell the camera where to draw the preview.
         try {
-            System.out.println(mCamera);
             mCamera.setPreviewDisplay(holder);
-            mCamera.startPreview();
         } catch (IOException e) {
-            Log.d("yolo", "Error setting camera preview: " + e.getMessage());
+            Log.e("Camera Preview", "Could not set preview display: " + e.getMessage());
+            e.printStackTrace();
         }
+        mCamera.startPreview();
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
-        // empty. Take care of releasing the Camera preview in your activity.
+        mCamera.stopPreview();
+        // Take care of releasing the Camera preview in your activity.
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
@@ -63,7 +66,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.startPreview();
 
         } catch (Exception e){
-            Log.d("yolo", "Error starting camera preview: " + e.getMessage());
+            Log.e("Camera Preview", "Error starting camera preview: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

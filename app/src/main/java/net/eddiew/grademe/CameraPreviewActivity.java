@@ -1,9 +1,7 @@
 package net.eddiew.grademe;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
@@ -13,14 +11,10 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
-
-import net.eddiew.grademe.R;
+import android.widget.ImageView;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,7 +22,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 public class CameraPreviewActivity extends Activity {
     public static final int MEDIA_TYPE_IMAGE = 1;
@@ -43,11 +36,8 @@ public class CameraPreviewActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera_preview);
 
-        // Creates a Camera instance
-        mCamera = getCameraInstance();
-        mCamera.setDisplayOrientation(90);
         // Create our Preview view and set it as the content of our activity.
-        mPreview = new CameraPreview(this, mCamera);
+        mPreview = new CameraPreview(this);
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
         preview.addView(mPreview);
 
@@ -56,37 +46,44 @@ public class CameraPreviewActivity extends Activity {
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
 
-                //Bitmap mBitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                Bitmap image = BitmapFactory.decodeByteArray(data, 0, data.length);
+                // Switch to preprocess activity
+                Intent intent = new Intent(getApplicationContext(), PreprocessActivity.class);
+                intent.putExtra("RawImage", image);
+                startActivity(intent);
+                // TODO: stop polling camera
 
+//                MainActivity.Tess.setImage(image);
+//                String text = MainActivity.Tess.getUTF8Text();
+//                String hocrText = MainActivity.Tess.getHOCRText(0);
+//                File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
+//                if (pictureFile == null){
+//                    Log.d("yolo", "Error creating media file, check storage permissions: ");
+//                    return;
+//                }
 
-                File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
-                if (pictureFile == null){
-                    Log.d("yolo", "Error creating media file, check storage permissions: ");
-                    return;
-                }
-
-                try {
-                    FileOutputStream fos = new FileOutputStream(pictureFile);
-                    fos.write(data);
-                    fos.close();
-
-                    Intent i = new Intent(Intent.ACTION_SEND);
-                    i.setType("message/rfc822");
-                    i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"ewang1997@gmail.com"});
-                    i.putExtra(Intent.EXTRA_SUBJECT, "herp");
-                    i.putExtra(Intent.EXTRA_TEXT   , "derp");
-                    Uri uri = Uri.fromFile(pictureFile);
-                    i.putExtra(Intent.EXTRA_STREAM, uri);
-                    try {
-                        startActivity(Intent.createChooser(i, "Send mail..."));
-                    } catch (android.content.ActivityNotFoundException ex) {
-                    }
-
-                } catch (FileNotFoundException e) {
-                    Log.d("yolo", "File not found: " + e.getMessage());
-                } catch (IOException e) {
-                    Log.d("yolo", "Error accessing file: " + e.getMessage());
-                }
+//                try {
+//                    FileOutputStream fos = new FileOutputStream(pictureFile);
+//                    fos.write(data);
+//                    fos.close();
+//
+//                    Intent i = new Intent(Intent.ACTION_SEND);
+//                    i.setType("message/rfc822");
+//                    i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"ewang1997@gmail.com"});
+//                    i.putExtra(Intent.EXTRA_SUBJECT, "herp");
+//                    i.putExtra(Intent.EXTRA_TEXT   , "derp");
+//                    Uri uri = Uri.fromFile(pictureFile);
+//                    i.putExtra(Intent.EXTRA_STREAM, uri);
+//                    try {
+//                        startActivity(Intent.createChooser(i, "Send mail..."));
+//                    } catch (android.content.ActivityNotFoundException ex) {
+//                    }
+//
+//                } catch (FileNotFoundException e) {
+//                    Log.d("yolo", "File not found: " + e.getMessage());
+//                } catch (IOException e) {
+//                    Log.d("yolo", "Error accessing file: " + e.getMessage());
+//                }
             }
         };
 
@@ -102,14 +99,14 @@ public class CameraPreviewActivity extends Activity {
         );
     }
 
-    public static Camera getCameraInstance(){
-        Camera c = null;
-        try {
-            c = Camera.open(); // attempt to get a Camera instance
-        }
-        catch (Exception e){
-            // Camera is not available (in use or does not exist)
-        }
+    public static Camera getCameraInstance() throws Exception {
+        Camera c = Camera.open(); // attempt to get a Camera instance
+        if (c == null) throw new Exception();
+        Camera.Parameters params = c.getParameters();
+        params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+        params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+        params.setColorEffect(Camera.Parameters.EFFECT_MONO);
+        c.setParameters(params);
         return c; // returns null if camera is unavailable
     }
 
@@ -152,27 +149,46 @@ public class CameraPreviewActivity extends Activity {
         return mediaFile;
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
 
-
-
+        // Creates a Camera instance
+        try {
+            mCamera = getCameraInstance();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+        mCamera.setDisplayOrientation(90);
+        mPreview.setCamera(mCamera);
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-
+        try {
+            mCamera.reconnect();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+        mCamera.startPreview();
     }
 
     @Override
     protected void onPause() {
+        mCamera.stopPreview();
+        mCamera.unlock();
         super.onPause();
     }
 
     @Override
-    protected void onDestroy() { // TODO REALLY SHOULD BE DOING THIS IN onPause(), but I can't figure out how to without crashing the app
-        super.onDestroy();
-        mCamera.stopPreview();
-        releaseCamera();              // release the camera immediately on pause event
+    protected void onStop() {
+        mCamera.release();
+        super.onStop();
     }
 
     private void releaseCamera(){
