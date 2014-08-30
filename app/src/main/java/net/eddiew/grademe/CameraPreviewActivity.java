@@ -103,10 +103,21 @@ public class CameraPreviewActivity extends Activity {
         Camera c = Camera.open(); // attempt to get a Camera instance
         if (c == null) throw new Exception();
         Camera.Parameters params = c.getParameters();
-        params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-        params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-        params.setColorEffect(Camera.Parameters.EFFECT_MONO);
-        c.setParameters(params);
+        try {
+            params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+            c.setParameters(params);
+        }
+        catch (Exception e) {}
+        try {
+            params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+            c.setParameters(params);
+        }
+        catch (Exception e) {}
+        try {
+            params.setColorEffect(Camera.Parameters.EFFECT_MONO);
+            c.setParameters(params);
+        }
+        catch (Exception e) {}
         return c; // returns null if camera is unavailable
     }
 
