@@ -55,16 +55,15 @@ public class MainActivity extends Activity {
         }
         TessBaseAPI tess = new TessBaseAPI();
         tess.init(DATA_PATH, "eng");
-        Log.v("Tesseract Initialization", "success!");
     }
 
     private void tessSetup() throws IOException{
         new File(DATA_PATH + "tessdata/").mkdirs();
-        //File trainedData = new File(DATA_PATH + "tessdata/eng.traineddata");
-        //if (!trainedData.exists()) {
         AssetManager assMan = getAssets();
-        for (String fileName : assMan.list("tessdata/")) {
+        for (String fileName : assMan.list("tessdata")) {
             InputStream in = assMan.open("tessdata/" + fileName);
+            File file = new File(DATA_PATH + "tessdata/" + fileName);
+            if (file.exists()) continue;
             OutputStream out = new FileOutputStream(DATA_PATH + "tessdata/" + fileName);
             byte[] buf = new byte[1024];
             int len;
@@ -76,7 +75,6 @@ public class MainActivity extends Activity {
             Log.v("Tesseract Setup", "Copied: " + fileName);
         }
         Log.v("Tesseract Setup", "All tessdata files copied.");
-        //}
     }
 
     private void switchActivity(int id)
