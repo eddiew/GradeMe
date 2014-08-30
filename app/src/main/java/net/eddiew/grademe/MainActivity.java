@@ -1,12 +1,11 @@
 package net.eddiew.grademe;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -15,30 +14,32 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 
-import com.googlecode.leptonica.android.Pix;
 import com.googlecode.tesseract.android.TessBaseAPI;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements NewTestDFragment.NewTestDListener{
     ArrayAdapter<String> adapter;
     public static final String DATA_PATH = Environment.getExternalStorageDirectory().toString() + "/GradeMe/";
-    String[] menuItems = {"Camera Control Demo", "Blank1", "Blank2"};
+
+    ArrayList<String> menuItems = new ArrayList<String>();
+
     private AssetManager assMan;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        menuItems.add("Camera Control Demo");
         assMan = getAssets();
 
         // Sets items in ListView
@@ -124,6 +125,11 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void createNewTest()
+    {
+        new NewTestDFragment().show(getFragmentManager(), "");
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -131,15 +137,22 @@ public class MainActivity extends Activity {
         return true;
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        // Handle action bar item clicks here.
+        switch (item.getItemId()) {
+            case R.id.action_new:
+                createNewTest();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
+    }
+
+    @Override // Info from NewTestDialog received here. Actually make new item here
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        String title = ((NewTestDFragment) dialog).name;
+        adapter.add(title);
     }
 }
