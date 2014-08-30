@@ -31,6 +31,8 @@ public class CameraPreviewActivity extends Activity {
     private CameraPreview mPreview;
     private Camera.PictureCallback mPicture;
 
+    public static Bitmap Capture;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,12 +48,10 @@ public class CameraPreviewActivity extends Activity {
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
 
-                Bitmap image = BitmapFactory.decodeByteArray(data, 0, data.length);
+                Capture = BitmapFactory.decodeByteArray(data, 0, data.length);
                 // Switch to preprocess activity
-                Intent intent = new Intent(getApplicationContext(), PreprocessActivity.class);
-                intent.putExtra("RawImage", image);
+                Intent intent = new Intent(CameraPreviewActivity.this, PreprocessActivity.class);
                 startActivity(intent);
-                // TODO: stop polling camera
 
 //                MainActivity.Tess.setImage(image);
 //                String text = MainActivity.Tess.getUTF8Text();
