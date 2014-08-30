@@ -27,9 +27,11 @@ public class MainActivity extends Activity {
         for (String asset : assetNames) {
             Log.e("assets", asset);
         }
+        int stuff;
 //        TessBaseAPI tess = new TessBaseAPI();
 //        tess.init("assets/tessdata/eng.traineddata", "eng");
 //        tess.setImage("assets/test2.png");
+        boolean more_stuff;
     }
 
     @Override
