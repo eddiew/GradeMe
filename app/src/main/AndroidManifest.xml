@@ -23,7 +23,13 @@
             android:screenOrientation="portrait">
             <!-- configure this activity to use landscape orientation -->
         </activity>
-    </application>'
+        <activity
+            android:name=".PreprocessActivity"
+            android:label="@string/title_activity_preprocess"
+            android:screenOrientation="portrait">
+            <!-- configure this activity to use landscape orientation -->
+        </activity>
+    </application>
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" />

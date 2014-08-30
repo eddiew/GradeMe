@@ -5,6 +5,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_camera_preview">CameraPreviewActivity</string>
+    <string name="title_activity_preprocess">Preprocess Image</string>
     <string-array name="preprocess_configurables">
         <item>Sharpness</item>
         <item>Brightness</item>

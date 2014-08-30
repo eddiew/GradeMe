@@ -14,8 +14,8 @@ public class PreprocessActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Intent intent = getIntent();
-        raw = (Bitmap) intent.getParcelableExtra("RawImage");
+        super.onCreate(savedInstanceState);
+        raw = CameraPreviewActivity.Capture;
         setContentView(R.layout.view_preprocess);
         ImageView preview = (ImageView) findViewById(R.id.preview);
         preview.setImageBitmap(raw);
