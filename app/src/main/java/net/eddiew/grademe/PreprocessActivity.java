@@ -11,6 +11,8 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import net.eddiew.grademe.bitmapFilters.BitmapFilters;
+
 import java.util.HashMap;
 
 /**
@@ -22,6 +24,7 @@ public class PreprocessActivity extends Activity implements AdapterView.OnItemSe
     private Spinner settingSpinner;
     private SeekBar settingSeekBar;
     private TextView settingValue;
+    private Bitmap[] processed = new Bitmap[3];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +32,6 @@ public class PreprocessActivity extends Activity implements AdapterView.OnItemSe
         raw = CameraPreviewActivity.Capture;
         setContentView(R.layout.view_preprocess);
         ImageView preview = (ImageView) findViewById(R.id.preview);
-        preview.setImageBitmap(raw);
         for (String setting : getResources().getStringArray(R.array.preprocess_configurables)) {
             settings.put(setting, 0);
         }
@@ -38,6 +40,10 @@ public class PreprocessActivity extends Activity implements AdapterView.OnItemSe
         settingSeekBar = (SeekBar)findViewById(R.id.setting_seekbar);
         settingSeekBar.setOnSeekBarChangeListener(this);
         settingValue = (TextView)findViewById(R.id.setting_value);
+        processed[0] = raw;
+        processed[1] = raw;
+        processed[2] = raw;
+        preview.setImageBitmap(processed[2]);
     }
 
     private String getCurrentSetting() {
@@ -66,6 +72,16 @@ public class PreprocessActivity extends Activity implements AdapterView.OnItemSe
         settingValue.setText("" + val);
         switch (getCurrentSetting()) {
             case "Sharpness":
+                processed[0] = BitmapFilters.sharpen(raw, val);
+                processed[1] = BitmapFilters.brighten(processed[0], settings.get("Brightness"));
+                processed[2] = BitmapFilters.contrast(processed[1], settings.get("Contrast"));
+                break;
+            case "Brightness":
+                processed[1] = BitmapFilters.brighten(processed[0], val);
+                processed[2] = BitmapFilters.contrast(processed[1], settings.get("Contrast"));
+                break;
+            case "Contrast":
+                processed[2] = BitmapFilters.contrast(processed[1], val);
                 break;
         }
     }
