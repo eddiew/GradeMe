@@ -1,7 +1,9 @@
 package net.eddiew.grademe;
 
 import android.app.Activity;
+import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -14,8 +16,21 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        AssetManager assetManager = getAssets();
+        String[] assetNames;
+        try {
+            assetNames = assetManager.list("");
+        }
+        catch (Exception e) {
+            assetNames = new String[]{"NONE FOUND"};
+        }
+        for (String asset : assetNames) {
+            Log.e("assets", asset);
+        }
+//        TessBaseAPI tess = new TessBaseAPI();
+//        tess.init("assets/tessdata/eng.traineddata", "eng");
+//        tess.setImage("assets/test2.png");
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
