@@ -38,6 +38,7 @@ public class MainActivity extends Activity {
             }
         };
         listView.setOnItemClickListener(mMessageClickedHandler);
+        int blah = 0;
     }
 
     private void switchActivity(int id)
