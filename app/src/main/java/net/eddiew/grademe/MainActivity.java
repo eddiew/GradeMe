@@ -27,7 +27,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 
 
-public class MainActivity extends Activity implements NewTestDFragment.NewTestDListener{
+public class MainActivity extends Activity implements NewTestDFragment.NewTestDListener, SelectTestDFragment.SelectTestDListener {
     ArrayAdapter<String> adapter;
     public static final String DATA_PATH = Environment.getExternalStorageDirectory().toString() + "/GradeMe/";
 
@@ -52,8 +52,9 @@ public class MainActivity extends Activity implements NewTestDFragment.NewTestDL
         // Click listener
         AdapterView.OnItemClickListener mMessageClickedHandler = new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView parent, View v, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(), CameraPreviewActivity.class);
-                startActivity(intent);
+                SelectTestDFragment st = new SelectTestDFragment();
+                st.setSelect(position);
+                st.show(getFragmentManager(), "");
             }
         };
         listView.setOnItemClickListener(mMessageClickedHandler);
@@ -121,7 +122,7 @@ public class MainActivity extends Activity implements NewTestDFragment.NewTestDL
         // Handle action bar item clicks here.
         switch (item.getItemId()) {
             case R.id.action_new:
-                createNewTest();
+                new NewTestDFragment().show(getFragmentManager(), "");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -132,5 +133,18 @@ public class MainActivity extends Activity implements NewTestDFragment.NewTestDL
     public void onDialogPositiveClick(DialogFragment dialog) {
         String title = ((NewTestDFragment) dialog).name;
         adapter.add(title);
+    }
+
+    @Override
+    public void onSDialogPositiveClick(DialogFragment dialog) {
+        int test = ((SelectTestDFragment) dialog).select;
+
+        Intent intent = new Intent(this, CameraPreviewActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onSDialogNegativeClick(DialogFragment dialog) {
+        int test = ((SelectTestDFragment) dialog).select;
     }
 }
