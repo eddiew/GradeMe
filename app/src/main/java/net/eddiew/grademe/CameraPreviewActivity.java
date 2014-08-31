@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
@@ -49,6 +50,9 @@ public class CameraPreviewActivity extends Activity {
             public void onPictureTaken(byte[] data, Camera camera) {
 
                 Capture = BitmapFactory.decodeByteArray(data, 0, data.length);
+                Matrix matrix = new Matrix();
+                matrix.postRotate(90);
+                Capture = Bitmap.createBitmap(Capture , 0, 0, Capture.getWidth(), Capture.getHeight(), matrix, true);
                 // Switch to preprocess activity
                 Intent intent = new Intent(CameraPreviewActivity.this, PreprocessActivity.class);
                 startActivity(intent);
@@ -200,13 +204,6 @@ public class CameraPreviewActivity extends Activity {
     protected void onStop() {
         mCamera.release();
         super.onStop();
-    }
-
-    private void releaseCamera(){
-        if (mCamera != null){
-            mCamera.release();        // release the camera for other applications
-            mCamera = null;
-        }
     }
 
     @Override

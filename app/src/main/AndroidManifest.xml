@@ -29,6 +29,12 @@
             android:screenOrientation="portrait">
             <!-- configure this activity to use landscape orientation -->
         </activity>
+        <activity
+            android:name=".GradeActivity"
+            android:label="@string/title_activity_grade"
+            android:screenOrientation="portrait">
+            <!-- configure this activity to use landscape orientation -->
+        </activity>
     </application>
 
     <uses-permission android:name="android.permission.CAMERA" />

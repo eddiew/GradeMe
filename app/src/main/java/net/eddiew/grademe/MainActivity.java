@@ -40,7 +40,6 @@ public class MainActivity extends Activity implements NewTestDFragment.NewTestDL
     ArrayList<String> menuItems = new ArrayList<String>();
 
     private AssetManager assMan;
-    //public static TessBaseAPI Tess;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
