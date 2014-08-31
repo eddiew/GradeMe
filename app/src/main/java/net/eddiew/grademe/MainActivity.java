@@ -59,17 +59,15 @@ public class MainActivity extends Activity implements NewTestDFragment.NewTestDL
         };
         listView.setOnItemClickListener(mMessageClickedHandler);
 
-//        // Tesseract Initialization
-//        try {
-//            tessSetup();
-//        }
-//        catch (IOException e) {
-//            Log.e("Tesseract Setup", "FAILED: IO Exception");
-//            e.printStackTrace();
-//            return;
-//        }
-//        Tess = new TessBaseAPI();
-//        Tess.init(DATA_PATH, "eng");
+        // Tesseract Initialization
+        try {
+            tessSetup(true);
+        }
+        catch (IOException e) {
+            Log.e("Tesseract Setup", "FAILED: IO Exception");
+            e.printStackTrace();
+            return;
+        }
 
 //        // OCR test TODO: remove
 //        Bitmap testBitmap;
@@ -91,12 +89,16 @@ public class MainActivity extends Activity implements NewTestDFragment.NewTestDL
     }
 
     private void tessSetup() throws IOException{
-        new File(DATA_PATH + "tessdata/").mkdirs();
+        tessSetup(false);
+    }
+
+    private void tessSetup(boolean force) throws IOException{
+        new File(DATA_PATH + "tessdata/configs/").mkdirs();
         for (String fileName : assMan.list("tessdata")) {
             InputStream in = assMan.open("tessdata/" + fileName);
             File file = new File(DATA_PATH + "tessdata/" + fileName);
-            if (file.exists()) continue;
-            OutputStream out = new FileOutputStream(DATA_PATH + "tessdata/" + fileName);
+            if (!force && file.exists()) continue;
+            OutputStream out = new FileOutputStream(file);
             byte[] buf = new byte[1024];
             int len;
             while ((len = in.read(buf)) > 0) {
@@ -106,7 +108,7 @@ public class MainActivity extends Activity implements NewTestDFragment.NewTestDL
             out.close();
             Log.v("Tesseract Setup", "Copied: " + fileName);
         }
-        Log.v("Tesseract Setup", "All tessdata files copied.");
+        Log.d("Tesseract Setup", "All tessdata files copied.");
     }
 
     @Override
