@@ -6,8 +6,13 @@ import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Rect;
+import android.graphics.pdf.PdfDocument;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.print.pdf.PrintedPdfDocument;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,16 +36,16 @@ public class MainActivity extends Activity implements NewTestDFragment.NewTestDL
     ArrayAdapter<String> adapter;
     public static final String DATA_PATH = Environment.getExternalStorageDirectory().toString() + "/GradeMe/";
 
+    ArrayList<MathTest> mathTests = new ArrayList<MathTest>();
     ArrayList<String> menuItems = new ArrayList<String>();
 
     private AssetManager assMan;
-    public static TessBaseAPI Tess;
+    //public static TessBaseAPI Tess;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        menuItems.add("Camera Control Demo");
         assMan = getAssets();
 
         // Sets items in ListView
@@ -59,17 +64,17 @@ public class MainActivity extends Activity implements NewTestDFragment.NewTestDL
         };
         listView.setOnItemClickListener(mMessageClickedHandler);
 
-        // Tesseract Initialization
-        try {
-            tessSetup();
-        }
-        catch (IOException e) {
-            Log.e("Tesseract Setup", "FAILED: IO Exception");
-            e.printStackTrace();
-            return;
-        }
-        Tess = new TessBaseAPI();
-        Tess.init(DATA_PATH, "eng");
+//        // Tesseract Initialization
+//        try {
+//            tessSetup();
+//        }
+//        catch (IOException e) {
+//            Log.e("Tesseract Setup", "FAILED: IO Exception");
+//            e.printStackTrace();
+//            return;
+//        }
+//        Tess = new TessBaseAPI();
+//        Tess.init(DATA_PATH, "eng");
 
 //        // OCR test TODO: remove
 //        Bitmap testBitmap;
@@ -88,6 +93,9 @@ public class MainActivity extends Activity implements NewTestDFragment.NewTestDL
 //        String hocrText = Tess.getHOCRText(0);
 //        String boxText = Tess.getBoxText(0);
 //        Tess.end();
+
+        adapter.add("Addition Test 1");
+        newTest("Addition Test 1", 0);
     }
 
     private void tessSetup() throws IOException{
@@ -129,10 +137,16 @@ public class MainActivity extends Activity implements NewTestDFragment.NewTestDL
         }
     }
 
+    private void newTest(String name, int oper)
+    {
+        mathTests.add(new MathTest(name, oper, this));
+    }
+
     @Override // Info from NewTestDialog received here. Actually make new item here
     public void onDialogPositiveClick(DialogFragment dialog) {
         String title = ((NewTestDFragment) dialog).name;
         adapter.add(title);
+        newTest(title, ((NewTestDFragment) dialog).select);
     }
 
     @Override
@@ -146,5 +160,75 @@ public class MainActivity extends Activity implements NewTestDFragment.NewTestDL
     @Override
     public void onSDialogNegativeClick(DialogFragment dialog) {
         int test = ((SelectTestDFragment) dialog).select;
+        MathTest mTest = mathTests.get(test);
+        View view = mTest.testLayout;
+
+        view.measure(850, 1100);
+        Bitmap mBitmap = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+        Canvas mCanvas = new Canvas(mBitmap);
+
+        view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+        view.draw(mCanvas);
+
+        try {
+            File f = new File(DATA_PATH + "myImage.png");
+            f.createNewFile();
+            FileOutputStream out = new FileOutputStream(f);
+            mBitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+            out.flush();
+            out.close();
+
+            // Emailing
+            Intent i = new Intent(Intent.ACTION_SEND);
+            i.setType("message/rfc822");
+            i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"ewang1997@gmail.com"});
+            i.putExtra(Intent.EXTRA_SUBJECT, "Your Math Test");
+            Uri uri = Uri.fromFile(f);
+            i.putExtra(Intent.EXTRA_STREAM, uri);
+            try {
+                startActivity(Intent.createChooser(i, "Send mail..."));
+            } catch (android.content.ActivityNotFoundException ex) {
+            }
+            ////
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+//        // Making PDF
+//        // create a new document
+//        PdfDocument document = new PdfDocument();
+//        // crate a page description
+//        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(612, 792, 1).create();
+//        // start a page
+//        PdfDocument.Page page = document.startPage(pageInfo);
+//        // draw something on the page
+//        View content = mTest.testLayout;
+//        content.draw(page.getCanvas());
+//        // finish the page
+//        document.finishPage(page);
+//        // write the document content
+//        File outFile = new File(DATA_PATH + mTest.testName +".pdf");
+//        try {
+//            document.writeTo(new FileOutputStream(outFile));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            document.close();
+//            return;
+//        }
+//        //close the document
+//        document.close();
+//
+//        //Emailing
+//        Intent i = new Intent(Intent.ACTION_SEND);
+//        i.setType("message/rfc822");
+//        i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"ewang1997@gmail.com"});
+//        i.putExtra(Intent.EXTRA_SUBJECT, "Your Math Test");
+//        Uri uri = Uri.fromFile(outFile);
+//        i.putExtra(Intent.EXTRA_STREAM, uri);
+//        try {
+//            startActivity(Intent.createChooser(i, "Send mail..."));
+//        } catch (android.content.ActivityNotFoundException ex) {
+//        }
+//        ////
     }
 }
