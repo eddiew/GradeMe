@@ -65,7 +65,7 @@ public class MainActivity extends Activity implements NewTestDFragment.NewTestDL
 
         // Tesseract Initialization
         try {
-            tessSetup(true);
+            tessSetup();
         }
         catch (IOException e) {
             Log.e("Tesseract Setup", "FAILED: IO Exception");
